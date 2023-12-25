@@ -5,7 +5,12 @@ import 'package:http/http.dart' as http;
 import 'package:pg_sql_app/Exception/http_exception.dart';
 
 class AuthNotifier extends ChangeNotifier {
-  late String _username;
+  final String _username = "";
+  bool _isAuth = false;
+
+  bool get isAuth {
+    return _isAuth;
+  }
 
   String get username => _username;
 
@@ -25,6 +30,7 @@ class AuthNotifier extends ChangeNotifier {
         ),
       );
       final responseData = json.decode(response.body);
+      _isAuth = true; // will check this later
       if (responseData['error'] != null) {
         throw HttpException(responseData['error']['message']);
       }

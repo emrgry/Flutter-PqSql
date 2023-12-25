@@ -8,7 +8,7 @@ import 'package:provider/provider.dart';
 enum AuthMode { Signup, Login }
 
 class AuthScreen extends StatelessWidget {
-  static const routeName = '/auth';
+  static const routeName = '/advertisement-overview';
 
   @override
   Widget build(BuildContext context) {
@@ -57,7 +57,7 @@ class AuthScreen extends StatelessWidget {
                         ],
                       ),
                       child: Text(
-                        'MyShop',
+                        'PetShop',
                         style: TextStyle(
                           color: Theme.of(context)
                               .textTheme
