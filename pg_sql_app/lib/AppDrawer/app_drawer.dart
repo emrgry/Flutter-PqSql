@@ -15,12 +15,31 @@ class AppDrawer extends StatelessWidget {
           ),
           Divider(),
           ListTile(
+            leading: Icon(Icons.account_box),
+            title: Text('Profile'),
+            onTap: () {
+              Navigator.of(context).pushReplacementNamed('/profile');
+            },
+          ),
+          ListTile(
             leading: Icon(Icons.shop),
-            title: Text('Shop'),
+            title: Text('Advertisements'),
             onTap: () {
               Navigator.of(context).pushReplacementNamed('/');
-              // Navigator.of(context).pushReplacement(
-              //     CustomRoute(builder: (ctx) => OrdersScreen()));
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.add_chart_rounded),
+            title: Text('Publish Advertisements'),
+            onTap: () {
+              Navigator.of(context).pushReplacementNamed('/add-advertisement');
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.logout),
+            title: Text('Logout'),
+            onTap: () {
+              Navigator.of(context).pushReplacementNamed('/auth');
             },
           ),
         ],

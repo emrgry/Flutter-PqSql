@@ -10,7 +10,6 @@ class AdvertisementItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final advertisement = Provider.of<Advertisement>(context, listen: false);
     final authdata = Provider.of<AuthNotifier>(context, listen: false);
-    print("sad");
     return ClipRRect(
       borderRadius: BorderRadius.circular(10),
       child: GridTile(
@@ -40,7 +39,7 @@ class AdvertisementItem extends StatelessWidget {
             );
           },
           child: Hero(
-            tag: advertisement.id,
+            tag: advertisement.id ?? 0,
             child: FadeInImage(
               placeholder: const AssetImage('assets/images/puppy.jpg'),
               image: NetworkImage(advertisement.imageUrl),

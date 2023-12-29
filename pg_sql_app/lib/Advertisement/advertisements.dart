@@ -8,9 +8,9 @@ class Advertisements with ChangeNotifier {
   List<Advertisement> _items = List.generate(
       10,
       (index) => Advertisement(
-            id: 'id_$index',
-            userId: 'user_$index',
-            animalId: 'animal_$index',
+            id: index,
+            userId: index,
+            animalId: index,
             createdDate: '2023-01-${index + 1}',
             updateDate: '2023-02-${index + 1}',
             title: 'Sample Title $index',
@@ -30,9 +30,9 @@ class Advertisements with ChangeNotifier {
     _items = List.generate(
       10,
       (index) => Advertisement(
-        id: 'id_$index',
-        userId: 'user_$index',
-        animalId: 'animal_$index',
+        id: index,
+        userId: index,
+        animalId: index,
         createdDate: '2023-01-${index + 1}',
         updateDate: '2023-02-${index + 1}',
         title: 'Sample Title $index',

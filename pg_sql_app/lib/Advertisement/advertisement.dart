@@ -2,11 +2,11 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 
 class Advertisement with ChangeNotifier {
-  final String id;
-  final String userId;
-  final String animalId;
+  final int? id;
+  final int? userId;
+  final int animalId;
   final String createdDate;
-  final String updateDate;
+  final String? updateDate;
   final String title;
   final String description;
   final String imageUrl;
@@ -14,14 +14,15 @@ class Advertisement with ChangeNotifier {
   bool isUserApplied = false;
 
   Advertisement(
-      {required this.id,
-      required this.userId,
+      {this.id,
+      this.userId,
       required this.animalId,
       required this.createdDate,
-      required this.updateDate,
+      this.updateDate,
       required this.title,
       required this.description,
-      required this.imageUrl,
+      this.imageUrl =
+          'https://www.stfrancisanimalwelfare.co.uk/wp-content/uploads/placeholder-logo-2.png',
       required this.isActive,
       this.isUserApplied = false});
 
@@ -40,14 +41,14 @@ class Advertisement with ChangeNotifier {
   }
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'userId': userId,
+        'id': id ?? -1,
+        'userId': userId ?? -1,
         'animalId': animalId,
         'createdDate': createdDate,
-        'updateDate': updateDate,
+        'updateDate': updateDate ?? "",
         'title': title,
         'description': description,
-        'imageUrl': imageUrl,
+        'imageUrl': imageUrl ?? "",
         'isActive': isActive,
       };
 

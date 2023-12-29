@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:pg_sql_app/Advertisement/add_advertisement.dart';
 import 'package:pg_sql_app/Advertisement/advertisements.dart';
 import 'package:pg_sql_app/Helpers/custom_route.dart';
 import 'package:pg_sql_app/Login/auth.dart';
 import 'package:pg_sql_app/Login/auth_screen.dart';
 import 'package:pg_sql_app/Advertisement/advertisementOverviewScreen.dart';
+import 'package:pg_sql_app/Login/profile_screen.dart';
 import 'package:provider/provider.dart';
 
 void main() => runApp(const MyApp());
@@ -44,8 +46,12 @@ class MyApp extends StatelessWidget {
               ),
               home: auth.isAuth ? AdvertisementOverviewScreen() : AuthScreen(),
               routes: {
+                AuthScreen.routeName: (context) => AuthScreen(),
                 AdvertisementOverviewScreen.routeName: (context) =>
                     AdvertisementOverviewScreen(),
+                AddAdvertisementPage.routeName: (context) =>
+                    AddAdvertisementPage(),
+                ProfileScreen.routeName: (context) => ProfileScreen(),
               }),
         ));
   }
