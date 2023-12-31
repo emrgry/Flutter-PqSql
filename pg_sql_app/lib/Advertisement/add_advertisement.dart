@@ -1,7 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:pg_sql_app/Advertisement/advertisement.dart';
 import 'package:http/http.dart' as http;
+import 'package:pg_sql_app/Data/animal.dart';
+import 'package:pg_sql_app/Data/city.dart';
+import 'package:pg_sql_app/Login/auth.dart';
 import 'dart:convert';
+
+import 'package:pg_sql_app/Login/user_model.dart';
+import 'package:provider/provider.dart';
 
 class AddAdvertisementPage extends StatefulWidget {
   static const routeName = '/add-advertisement';
@@ -13,24 +20,34 @@ class _AddAdvertisementPageState extends State<AddAdvertisementPage> {
   final _formKey = GlobalKey<FormState>();
   String title = "Animal";
   String description = "Description";
+  String image_url = "";
   DateTime createdDate = DateTime.now();
   bool isActive = false;
-  String selectedAnimalType = 'Kedi'; // Default value
+  String selectedAnimal = ''; // Default value
+  List<String> animals = [];
 
-  final animals = <String>[
-    'Köpek',
-    'Kedi',
-    'Kuş',
-    'Balık',
-    'Hamster',
-    'Kaplumbağa',
-    'Tavşan',
-    'Sincap',
-    'Örümcek',
-    'Koala'
-  ];
+  @override
+  void initState() {
+    super.initState();
+    fetchCitiesAndAnimals();
+  }
+
+  Future<void> fetchCitiesAndAnimals() async {
+    // Fetch animals
+    var animalResponse = await http
+        .get(Uri.parse('http://localhost:8080/petShop/getAllAnimals'));
+    List<dynamic> animalData = jsonDecode(animalResponse.body);
+
+    setState(() {
+      animals =
+          animalData.map<String>((item) => Animal.fromJson(item).name).toList();
+      selectedAnimal = animals[0];
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    String username = Provider.of<AuthNotifier>(context).username;
     return Scaffold(
       appBar: AppBar(
         title: Text('Add Advertisement'),
@@ -68,19 +85,26 @@ class _AddAdvertisementPageState extends State<AddAdvertisementPage> {
                   },
                 ),
                 SizedBox(height: 16),
-                DropdownButtonFormField<String>(
-                  value: selectedAnimalType,
-                  decoration: InputDecoration(labelText: 'Animal Type'),
-                  items: animals.map((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
+                DropdownButtonFormField(
+                  value: selectedAnimal,
+                  items: animals.map((animal) {
+                    return DropdownMenuItem(
+                      child: Text(animal),
+                      value: animal,
                     );
                   }).toList(),
-                  onChanged: (String? newValue) {
+                  onChanged: (value) {
                     setState(() {
-                      selectedAnimalType = newValue!;
+                      selectedAnimal = value!;
                     });
+                  },
+                  decoration: InputDecoration(labelText: 'Animal Type'),
+                ),
+                TextFormField(
+                  decoration: InputDecoration(labelText: 'Image URL'),
+                  onSaved: (value) {
+                    image_url = value ??
+                        'https://raw.githubusercontent.com/emrgry/petDB/main/download.jpeg';
                   },
                 ),
                 SizedBox(height: 16),
@@ -89,30 +113,27 @@ class _AddAdvertisementPageState extends State<AddAdvertisementPage> {
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
                       _formKey.currentState!.save();
-                      int selectedIndex = animals.indexOf(selectedAnimalType);
+                      int selectedIndex = animals.indexOf(selectedAnimal);
                       Advertisement adv = Advertisement(
-                        id: 0,
-                        userId: 0,
+                        name: username,
                         title: title,
                         description: description,
-                        createdDate: DateTime.now().toString(),
-                        updateDate: DateTime.now().toString(),
+                        createdDate:
+                            DateFormat('yyyy-MM-dd').format(DateTime.now()),
+                        updateDate:
+                            DateFormat('yyyy-MM-dd').format(DateTime.now()),
                         isActive: isActive,
-                        animalId: selectedIndex,
+                        animalName: selectedAnimal,
+                        imageUrl: image_url,
                       );
                       // Now you can use the values
-                      print(selectedAnimalType);
-                      print(title);
-                      print(createdDate);
-                      print(isActive);
                       var advJson = json.encode(adv.toJson());
-
                       // Send the Advertisement to the server
                       var url =
-                          Uri.parse('http://localhost:8080/petShop/addPost');
+                          Uri.parse('http://localhost:8080/petShop/createPost');
                       var response = await http.post(url,
                           headers: <String, String>{
-                            'Content-Type': 'application/json; charset=UTF-8',
+                            'Content-Type': 'application/json',
                           },
                           body: advJson);
 

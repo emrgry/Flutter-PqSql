@@ -5,51 +5,72 @@ import 'dart:convert';
 import 'package:pg_sql_app/Advertisement/advertisement.dart';
 
 class Advertisements with ChangeNotifier {
-  List<Advertisement> _items = List.generate(
-      10,
-      (index) => Advertisement(
-            id: index,
-            userId: index,
-            animalId: index,
-            createdDate: '2023-01-${index + 1}',
-            updateDate: '2023-02-${index + 1}',
-            title: 'Sample Title $index',
-            description: 'This is a sample description for item $index.',
-            imageUrl:
-                'https://placekitten.com/200/300?image=$index', // Placeholder image for demonstration
-            isActive: index.isEven,
-            isUserApplied: index % 3 == 0,
-          ));
+  List<Advertisement> _items = [];
+  // List<Advertisement> _items = List.generate(
+  //     10,
+  //     (index) => Advertisement(
+  //           id: index,
+  //           createdBy: index,
+  //           animalId: index,
+  //           createdDate: '2023-01-${index + 1}',
+  //           updateDate: '2023-02-${index + 1}',
+  //           title: 'Sample Title $index',
+  //           description: 'This is a sample description for item $index.',
+  //           imageUrl:
+  //               'https://placekitten.com/200/300?image=$index', // Placeholder image for demonstration
+  //           isActive: index.isEven,
+  //           isUserApplied: index % 3 == 0,
+  //         ));
 
   final _showFilter = "all";
   final String userId;
 
   Advertisements(this.userId, this._items);
 
-  List<Advertisement> get items {
-    _items = List.generate(
-      10,
-      (index) => Advertisement(
-        id: index,
-        userId: index,
-        animalId: index,
-        createdDate: '2023-01-${index + 1}',
-        updateDate: '2023-02-${index + 1}',
-        title: 'Sample Title $index',
-        description: 'This is a sample description for item $index.',
-        imageUrl:
-            'https://placekitten.com/200/300?image=$index', // Placeholder image for demonstration
-        isActive: index.isEven,
-        isUserApplied: index % 3 == 0,
-      ),
-    );
-    if (_showFilter == "Dog") {
-      return _items.where((advItem) => advItem.animalId == "Dog").toList();
-    } else if (_showFilter == "Cat") {
-      return _items.where((advItem) => advItem.animalId == "Cat").toList();
+  Future<List<Advertisement>> fetchAdvertisements() async {
+    final response =
+        await http.get(Uri.parse('http://localhost:8080/petShop/getAllPosts'));
+
+    if (response.statusCode == 200) {
+      List<dynamic> body = jsonDecode(response.body);
+      return body.map((dynamic item) => Advertisement.fromJson(item)).toList();
     } else {
-      return [..._items];
+      throw Exception('Failed to load advertisements');
     }
+  }
+
+  List<Advertisement> get items {
+    return [..._items];
+    // _items = List.generate(
+    //   10,
+    //   (index) => Advertisement(
+    //     id: index,
+    //     createdBy: index,
+    //     animalId: index,
+    //     createdDate: '2023-01-${index + 1}',
+    //     updateDate: '2023-02-${index + 1}',
+    //     title: 'Sample Title $index',
+    //     description: 'This is a sample description for item $index.',
+    //     imageUrl:
+    //         'https://placekitten.com/200/300?image=$index', // Placeholder image for demonstration
+    //     isActive: index.isEven,
+    //     isUserApplied: index % 3 == 0,
+    //   ),
+    // );
+    // if (_showFilter == "Dog") {
+    //   return _items.where((advItem) => advItem.animalId == "Dog").toList();
+    // } else if (_showFilter == "Cat") {
+    //   return _items.where((advItem) => advItem.animalId == "Cat").toList();
+    // } else {
+    //   return [..._items];
+    // }
+  }
+
+  void updateAdvertisements(List<dynamic> newAdvertisements) {
+    _items = newAdvertisements
+        .map<Advertisement>((item) => Advertisement.fromJson(item))
+        .toList();
+    notifyListeners();
   }
 
   Advertisement findById(String id) {

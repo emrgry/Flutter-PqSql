@@ -2,10 +2,14 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:pg_sql_app/Data/city.dart';
 import 'package:pg_sql_app/Exception/http_exception.dart';
 
 class AuthNotifier extends ChangeNotifier {
-  final String _username = "";
+  String _username = "";
+  String _password = "";
+
+  List<City> cities = [];
   bool _isAuth = false;
 
   bool get isAuth {
@@ -13,26 +17,28 @@ class AuthNotifier extends ChangeNotifier {
   }
 
   String get username => _username;
+  String get password => _password;
 
   Future<void> _authenticate(
       String username, String password, String urlSegment) async {
-    final url = Uri.parse("https://jsonplaceholder.typicode.com/posts/");
+    final url = Uri.parse("http://localhost:8080/petShop/checkUserLogin");
     try {
+      print("username: $username");
       final response = await http.post(
         url,
-        body: json.encode(
-          {
-            "userId": 1,
-            "id": 1,
-            // 'username': username,
-            // 'password': password,
-          },
-        ),
+        headers: {"Content-Type": "application/json"},
+        body: json.encode({
+          'userName': username,
+          'password': password,
+        }),
       );
       final responseData = json.decode(response.body);
-      _isAuth = true; // will check this later
-      if (responseData['error'] != null) {
-        throw HttpException(responseData['error']['message']);
+      if (responseData == 1) {
+        _isAuth = true;
+      } else if (responseData == 2) {
+        throw HttpException('INVALID_PASSWORD');
+      } else if (responseData == 3) {
+        throw HttpException('EMAIL_NOT_FOUND');
       }
       notifyListeners();
     } catch (error) {
@@ -41,11 +47,46 @@ class AuthNotifier extends ChangeNotifier {
     }
   }
 
+  Future<void> _signup(
+      String username, String password, int id, String urlSegment) async {
+    final url = Uri.parse("http://localhost:8080/petShop/createUser");
+    try {
+      final response = await http.post(
+        url,
+        headers: {"Content-Type": "application/json"},
+        body: json.encode({
+          'userName': username,
+          'password': password,
+          'cityId': id,
+        }),
+      );
+      if (response.statusCode == 201) {
+        _isAuth = true;
+        notifyListeners();
+      }
+    } catch (error) {
+      print(error);
+      throw error;
+    }
+  }
+
+  Future<void> fetchCities() async {
+    // Fetch cities
+    var cityResponse =
+        await http.get(Uri.parse('http://localhost:8080/petShop/getAllCities'));
+    List<dynamic> cityData = jsonDecode(cityResponse.body);
+    cities = cityData.map((item) => City.fromJson(item)).toList();
+  }
+
   Future<void> login(String email, String password) async {
+    _username = email;
+    _password = password;
     return _authenticate(email, password, 'signInWithPassword');
   }
 
-  Future<void> signup(String email, String password) async {
-    return _authenticate(email, password, 'signUp');
+  Future<void> signup(String email, String password, City city) async {
+    _username = email;
+    _password = password;
+    return _signup(email, password, city.id ?? 1, 'signUp');
   }
 }

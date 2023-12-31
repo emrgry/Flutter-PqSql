@@ -1,22 +1,26 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
+import 'package:pg_sql_app/Data/animal.dart';
+import 'package:pg_sql_app/Login/user_model.dart';
 
 class Advertisement with ChangeNotifier {
   final int? id;
-  final int? userId;
-  final int animalId;
+  final User? createdBy;
+  final String? name;
   final String createdDate;
   final String? updateDate;
   final String title;
   final String description;
   final String imageUrl;
+  final Animal? animal;
+  final String? animalName;
   final bool isActive;
   bool isUserApplied = false;
 
   Advertisement(
       {this.id,
-      this.userId,
-      required this.animalId,
+      this.createdBy,
+      this.name,
       required this.createdDate,
       this.updateDate,
       required this.title,
@@ -24,32 +28,35 @@ class Advertisement with ChangeNotifier {
       this.imageUrl =
           'https://www.stfrancisanimalwelfare.co.uk/wp-content/uploads/placeholder-logo-2.png',
       required this.isActive,
+      this.animal,
+      this.animalName,
       this.isUserApplied = false});
 
   factory Advertisement.fromJson(Map<String, dynamic> json) {
     return Advertisement(
       id: json['id'],
-      userId: json['userId'],
-      animalId: json['animalId'],
+      createdBy: User.fromJson(json['createdBy']),
       createdDate: json['createdDate'],
-      updateDate: json['updateDate'],
+      updateDate: json['updateDate'] ?? "",
       title: json['title'],
       description: json['description'],
-      imageUrl: json['imageUrl'],
+      imageUrl: json['imageUrl'] ??
+          'https://www.stfrancisanimalwelfare.co.uk/wp-content/uploads/placeholder-logo-2.png',
       isActive: json['isActive'],
+      animal: Animal.fromJson(json['animal']),
     );
   }
 
   Map<String, dynamic> toJson() => {
-        'id': id ?? -1,
-        'userId': userId ?? -1,
-        'animalId': animalId,
+        'userName': name,
         'createdDate': createdDate,
-        'updateDate': updateDate ?? "",
+        'updateDate': updateDate,
         'title': title,
         'description': description,
-        'imageUrl': imageUrl ?? "",
+        'imageUrl': imageUrl ??
+            "https://www.stfrancisanimalwelfare.co.uk/wp-content/uploads/placeholder-logo-2.png",
         'isActive': isActive,
+        'animalName': animalName,
       };
 
   void toggleApplyStatus(bool apply) {

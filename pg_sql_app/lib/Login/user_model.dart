@@ -1,41 +1,37 @@
+import 'package:pg_sql_app/Data/city.dart';
+
 class User {
   final String username;
   final String password;
   final String name;
   final String surname;
   final String address;
-  final int city;
-  final int? animalId;
+  final City city;
 
-  User({
-    required this.username,
-    required this.password,
-    required this.name,
-    required this.surname,
-    required this.address,
-    required this.city,
-    this.animalId,
-  });
+  User(
+      {required this.username,
+      required this.password,
+      required this.name,
+      required this.surname,
+      required this.address,
+      required this.city});
 
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
-      username: json['username'],
-      password: json['password'],
-      name: json['name'],
-      surname: json['surname'],
-      address: json['address'],
-      city: json['city'],
-      animalId: json['animal_id'],
-    );
+        username: json['userName'],
+        password: json['password'],
+        name: json['firstName'],
+        surname: json['lastName'],
+        address: json['address'],
+        city: City.fromJson(json['city']));
   }
 
   Map<String, dynamic> toJson() => {
-        'username': username,
+        'userName': username,
         'password': password,
-        'name': name,
-        'surname': surname,
+        'firstName': name,
+        'lastName': surname,
         'address': address,
-        'city': city,
-        'animal_id': animalId ?? "",
+        'city': city.toJson()
       };
 }

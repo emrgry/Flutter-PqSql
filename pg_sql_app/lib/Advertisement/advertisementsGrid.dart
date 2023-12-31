@@ -8,9 +8,7 @@ class AdvertisementsGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final advsData = Provider.of<Advertisements>(context);
-    print(advsData.items);
     final advs = advsData.items;
-    print(advs.length);
     return GridView.builder(
       padding: const EdgeInsets.all(10.0),
       itemCount: advs.length,

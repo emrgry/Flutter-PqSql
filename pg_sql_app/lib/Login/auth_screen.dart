@@ -1,6 +1,10 @@
-import 'dart:math';
+// ignore_for_file: use_build_context_synchronously
 
+import 'dart:convert';
+import 'dart:math';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
+import 'package:pg_sql_app/Data/city.dart';
 import 'package:pg_sql_app/Exception/http_exception.dart';
 import 'package:pg_sql_app/Login/auth.dart';
 import 'package:provider/provider.dart';
@@ -13,6 +17,7 @@ class AuthScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final deviceSize = MediaQuery.of(context).size;
+
     return Scaffold(
       body: Stack(
         children: <Widget>[
@@ -93,10 +98,8 @@ class _AuthCardState extends State<AuthCard>
     with SingleTickerProviderStateMixin {
   final GlobalKey<FormState> _formKey = GlobalKey();
   AuthMode _authMode = AuthMode.Login;
-  Map<String, String> _authData = {
-    'email': '',
-    'password': '',
-  };
+  Map<String, String> _authData = {'email': '', 'password': ''};
+  City? _selectedCity;
   var _isLoading = false;
   final _passwordController = TextEditingController();
   late AnimationController _controller;
@@ -153,16 +156,19 @@ class _AuthCardState extends State<AuthCard>
     });
 
     try {
+      print(_authMode);
       if (_authMode == AuthMode.Login) {
         // Log user in
         await Provider.of<AuthNotifier>(context, listen: false)
             .login(_authData["email"] ?? "", _authData["password"] ?? "");
       } else {
         // Sign user up
-        await Provider.of<AuthNotifier>(context, listen: false)
-            .signup(_authData["email"] ?? "", _authData["password"] ?? "");
+        await Provider.of<AuthNotifier>(context, listen: false).signup(
+            _authData["email"] ?? "",
+            _authData["password"] ?? "",
+            _selectedCity!);
       }
-      Navigator.of(context).pushReplacementNamed('/products-overview');
+      Navigator.of(context).pushReplacementNamed('/advertisement-overview');
     } on HttpException catch (error) {
       var errorMessage = 'Authentication error';
       if (error.toString().contains("EMAIL_EXIST")) {
@@ -202,6 +208,10 @@ class _AuthCardState extends State<AuthCard>
 
   @override
   Widget build(BuildContext context) {
+    String selectedCity = '';
+    Provider.of<AuthNotifier>(context, listen: false).fetchCities();
+    List<City> cities = Provider.of<AuthNotifier>(context).cities;
+    print(cities);
     final deviceSize = MediaQuery.of(context).size;
     return Card(
       shape: RoundedRectangleBorder(
@@ -258,18 +268,26 @@ class _AuthCardState extends State<AuthCard>
                     opacity: _opacityAnimation,
                     child: SlideTransition(
                       position: _slideAnimation,
-                      child: TextFormField(
-                        enabled: _authMode == AuthMode.Signup,
-                        decoration:
-                            InputDecoration(labelText: 'Confirm Password'),
-                        obscureText: true,
-                        validator: _authMode == AuthMode.Signup
-                            ? (value) {
-                                if (value != _passwordController.text) {
-                                  return 'Passwords do not match!';
-                                }
-                              }
-                            : null,
+                      child: DropdownButtonFormField(
+                        value: selectedCity.isEmpty
+                            ? null
+                            : selectedCity, // Handle null value
+                        items: cities
+                            .map((city) {
+                              return DropdownMenuItem(
+                                child: Text(city.name),
+                                value: city.name,
+                              );
+                            })
+                            .toList()
+                            .cast<DropdownMenuItem<String>>(),
+                        onChanged: (value) {
+                          setState(() {
+                            _selectedCity =
+                                cities.firstWhere((city) => city.name == value);
+                          });
+                        },
+                        decoration: InputDecoration(labelText: 'City'),
                       ),
                     ),
                   ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:pg_sql_app/Advertisement/advertisement.dart';
 import 'package:pg_sql_app/Advertisement/advertisementOverviewScreen.dart';
 import 'package:pg_sql_app/Login/auth.dart';
@@ -33,9 +34,49 @@ class AdvertisementItem extends StatelessWidget {
         ),
         child: GestureDetector(
           onTap: () {
-            Navigator.of(context).pushNamed(
-              AdvertisementOverviewScreen.routeName,
-              arguments: advertisement.id,
+            showDialog(
+              context: context,
+              builder: (ctx) => AlertDialog(
+                title: Text(advertisement.title),
+                content: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: AspectRatio(
+                        aspectRatio:
+                            16 / 9, // Adjust the aspect ratio as needed
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: Image.network(
+                            advertisement.imageUrl,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                    ),
+                    Text('Description: ${advertisement.description}'),
+                    Text('Created by: ${advertisement.createdBy?.username}'),
+                    Text(
+                        'Create date: ${DateFormat("dd/MM/yyyy").format(DateTime.parse(advertisement.createdDate))}'),
+
+                    // Add other fields as needed
+                  ],
+                ),
+                actions: [
+                  TextButton(
+                    child: Text('Apply'),
+                    onPressed: () {
+                      // Handle apply action here
+                    },
+                  ),
+                  TextButton(
+                    child: Text('Close'),
+                    onPressed: () {
+                      Navigator.of(ctx).pop();
+                    },
+                  ),
+                ],
+              ),
             );
           },
           child: Hero(
