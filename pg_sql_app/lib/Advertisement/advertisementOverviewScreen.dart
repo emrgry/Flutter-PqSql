@@ -3,6 +3,8 @@
 import 'package:flutter/material.dart';
 import 'package:pg_sql_app/Advertisement/advertisements.dart';
 import 'package:pg_sql_app/Advertisement/advertisementsGrid.dart';
+import 'package:pg_sql_app/Data/animal.dart';
+import 'package:pg_sql_app/Data/city.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 import '../AppDrawer/app_drawer.dart';
@@ -36,12 +38,19 @@ class _AdvertisementOverviewScreenState
   var _isInit = true;
   var _isLoading = false;
   var _data;
+  var desired_text = "All";
+  List<City> cities = [];
+  City? selectedCity;
+  List<Animal> animals = [];
+  Animal? selectedAnimal;
 
   @override
   void initState() {
     super.initState();
     // Call fetchData initially with the "All" filter
     fetchData("All");
+    fetchCities();
+    fetchAnimals();
   }
 
   Future<void> fetchData(String filter) async {
@@ -60,6 +69,25 @@ class _AdvertisementOverviewScreenState
         .updateAdvertisements(_data);
     setState(() {
       _isLoading = false;
+    });
+  }
+
+  Future<void> fetchCities() async {
+    // Fetch cities
+    var cityResponse =
+        await http.get(Uri.parse('http://localhost:8080/petShop/getAllCities'));
+    List<dynamic> cityData = jsonDecode(cityResponse.body);
+    cities = cityData.map((item) => City.fromJson(item)).toList();
+  }
+
+  Future<void> fetchAnimals() async {
+    // Fetch animals
+    var animalResponse = await http
+        .get(Uri.parse('http://localhost:8080/petShop/getAllAnimals'));
+    List<dynamic> animalData = jsonDecode(animalResponse.body);
+
+    setState(() {
+      animals = animalData.map((item) => Animal.fromJson(item)).toList();
     });
   }
 
@@ -150,7 +178,135 @@ class _AdvertisementOverviewScreenState
           ? const Center(
               child: CircularProgressIndicator(),
             )
-          : const AdvertisementsGrid(),
+          : Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    SizedBox(width: 10),
+                    Text(desired_text),
+                    SizedBox(width: 50),
+                    Expanded(
+                      child: DropdownButton<String>(
+                        isExpanded: true,
+                        value: selectedCity?.name ?? 'City',
+                        items: [
+                          const DropdownMenuItem(
+                            value: 'City',
+                            child: Text('City'),
+                          ),
+                          ...cities
+                              .map((city) {
+                                return DropdownMenuItem(
+                                  child: Text(city.name),
+                                  value: city.name,
+                                );
+                              })
+                              .toList()
+                              .cast<DropdownMenuItem<String>>()
+                        ],
+                        onChanged: (value) {
+                          setState(() {
+                            if (value == 'City') {
+                              selectedCity = null;
+                              return;
+                            }
+                            selectedCity =
+                                cities.firstWhere((city) => city.name == value);
+                          });
+                        },
+                      ),
+                    ),
+                    SizedBox(width: 10),
+                    Expanded(
+                      child: DropdownButton<String>(
+                        isExpanded: true,
+                        value: selectedAnimal?.name ?? 'Animal',
+                        items: [
+                          const DropdownMenuItem(
+                            value: 'Animal',
+                            child: Text('Animal'),
+                          ),
+                          ...animals
+                              .map((animal) {
+                                return DropdownMenuItem(
+                                  value: animal.name,
+                                  child: Text(animal.name),
+                                );
+                              })
+                              .toList()
+                              .cast<DropdownMenuItem<String>>()
+                        ],
+                        onChanged: (value) {
+                          setState(() {
+                            if (value == 'Animal') {
+                              selectedAnimal = null;
+                              return;
+                            }
+                            selectedAnimal = animals
+                                .firstWhere((animal) => animal.name == value);
+                          });
+                        },
+                      ),
+                    ),
+                    ElevatedButton(
+                      onPressed: () async {
+                        setState(() {
+                          _isLoading = true;
+                        });
+                        var url = '';
+                        if (selectedCity != null && selectedAnimal != null) {
+                          url =
+                              'http://localhost:8080/petShop/findByAnimalIdAndCityId?cityId=${selectedCity!.id}&animalId=${selectedAnimal!.id}';
+                        } else if (selectedAnimal != null) {
+                          url =
+                              'http://localhost:8080/petShop/findPostsByAnimalName?animalName=${selectedAnimal!.name}';
+                        } else {
+                          url = 'http://localhost:8080/petShop/getAllPosts';
+                        }
+                        final response = await http.get(Uri.parse(url));
+                        _data = json.decode(response.body);
+
+                        Provider.of<Advertisements>(context, listen: false)
+                            .updateAdvertisements(_data);
+                        setState(() {
+                          _isLoading = false;
+                        });
+                      },
+                      child: Text('Filter'),
+                    ),
+                  ],
+                ),
+                Expanded(child: AdvertisementsGrid()),
+              ],
+            ),
     );
   }
 }
+
+
+
+/*
+DropdownButtonFormField(
+          isExpanded: true,
+          isDense: true,
+          value: selectedCities,
+          items: cities.map((city) {
+            return DropdownMenuItem(
+              child: Text(city.name),
+              value: city.id,
+            );
+          }).toList(),
+          onChanged: (value) {
+            setState(() {
+              if (selectedCities.contains(value)) {
+                selectedCities.remove(value);
+              } else {
+                selectedCities.add(value as int);
+              }
+            });
+          },
+          decoration: InputDecoration(labelText: 'Cities'),
+        ),
+*/

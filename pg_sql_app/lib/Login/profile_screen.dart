@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:pg_sql_app/AppDrawer/app_drawer.dart';
 import 'package:pg_sql_app/Data/animal.dart';
 import 'package:pg_sql_app/Data/city.dart';
 import 'package:pg_sql_app/Login/auth.dart';
@@ -78,6 +79,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     String username = Provider.of<AuthNotifier>(context).username;
     String password = Provider.of<AuthNotifier>(context).password;
     return Scaffold(
+      drawer: AppDrawer(),
       appBar: AppBar(
         title: Text('Profile Screen'),
       ),

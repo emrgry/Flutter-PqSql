@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:pg_sql_app/Advertisement/advertisement.dart';
 import 'package:http/http.dart' as http;
+import 'package:pg_sql_app/AppDrawer/app_drawer.dart';
 import 'package:pg_sql_app/Data/animal.dart';
 import 'package:pg_sql_app/Data/city.dart';
 import 'package:pg_sql_app/Login/auth.dart';
@@ -49,6 +50,7 @@ class _AddAdvertisementPageState extends State<AddAdvertisementPage> {
   Widget build(BuildContext context) {
     String username = Provider.of<AuthNotifier>(context).username;
     return Scaffold(
+      drawer: AppDrawer(),
       appBar: AppBar(
         title: Text('Add Advertisement'),
       ),
@@ -120,9 +122,9 @@ class _AddAdvertisementPageState extends State<AddAdvertisementPage> {
                         description: description,
                         createdDate:
                             DateFormat('yyyy-MM-dd').format(DateTime.now()),
-                        updateDate:
+                        updatedDate:
                             DateFormat('yyyy-MM-dd').format(DateTime.now()),
-                        isActive: isActive,
+                        isActive: true,
                         animalName: selectedAnimal,
                         imageUrl: image_url,
                       );

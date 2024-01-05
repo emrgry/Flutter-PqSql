@@ -8,7 +8,7 @@ class Advertisement with ChangeNotifier {
   final User? createdBy;
   final String? name;
   final String createdDate;
-  final String? updateDate;
+  final String? updatedDate;
   final String title;
   final String description;
   final String imageUrl;
@@ -22,7 +22,7 @@ class Advertisement with ChangeNotifier {
       this.createdBy,
       this.name,
       required this.createdDate,
-      this.updateDate,
+      this.updatedDate,
       required this.title,
       required this.description,
       this.imageUrl =
@@ -37,7 +37,7 @@ class Advertisement with ChangeNotifier {
       id: json['id'],
       createdBy: User.fromJson(json['createdBy']),
       createdDate: json['createdDate'],
-      updateDate: json['updateDate'] ?? "",
+      updatedDate: json['updatedDate'] ?? "",
       title: json['title'],
       description: json['description'],
       imageUrl: json['imageUrl'] ??
@@ -50,7 +50,7 @@ class Advertisement with ChangeNotifier {
   Map<String, dynamic> toJson() => {
         'userName': name,
         'createdDate': createdDate,
-        'updateDate': updateDate,
+        'updatedDate': updatedDate,
         'title': title,
         'description': description,
         'imageUrl': imageUrl ??

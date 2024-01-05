@@ -3,10 +3,23 @@ import 'package:intl/intl.dart';
 import 'package:pg_sql_app/Advertisement/advertisement.dart';
 import 'package:pg_sql_app/Advertisement/advertisementOverviewScreen.dart';
 import 'package:pg_sql_app/Login/auth.dart';
-
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import 'package:provider/provider.dart';
 
 class AdvertisementItem extends StatelessWidget {
+  Future<void> fetchCitiesAndAnimals() async {
+    // Fetch animals
+    var animalResponse = await http
+        .get(Uri.parse('http://localhost:8080/petShop/getAllAnimals'));
+
+    // setState(() {
+    //   animals =
+    //       animalData.map<String>((item) => Animal.fromJson(item).name).toList();
+    //   selectedAnimal = animals[0];
+    // });
+  }
+
   @override
   Widget build(BuildContext context) {
     final advertisement = Provider.of<Advertisement>(context, listen: false);
@@ -23,7 +36,10 @@ class AdvertisementItem extends StatelessWidget {
                   : Icons.remove_circle_outline),
               color: Theme.of(context).colorScheme.secondary,
               onPressed: () {
-                adv.toggleApplyStatus(!adv.isUserApplied);
+                http.delete(Uri.parse(
+                    'http://localhost:8080/petShop/deletePost?id=${adv.id}'));
+                // adv.toggleApplyStatus(!adv.isUserApplied);
+                Navigator.of(context).pushReplacementNamed('/');
               },
             ),
           ),

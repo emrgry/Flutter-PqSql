@@ -20,9 +20,9 @@ class User {
     return User(
         username: json['userName'],
         password: json['password'],
-        name: json['firstName'],
-        surname: json['lastName'],
-        address: json['address'],
+        name: json['firstName'] ?? "",
+        surname: json['lastName'] ?? "",
+        address: json['address'] ?? "",
         city: City.fromJson(json['city']));
   }
 
