@@ -145,7 +145,7 @@ class _AuthCardState extends State<AuthCard>
             ));
   }
 
-  Future<void> _submit() async {
+  Future<void> _submit(BuildContext ctx) async {
     // if (!_formKey.currentState!.validate()) {
     //   // Invalid!
     //   return;
@@ -166,7 +166,8 @@ class _AuthCardState extends State<AuthCard>
         await Provider.of<AuthNotifier>(context, listen: false).signup(
             _authData["email"] ?? "",
             _authData["password"] ?? "",
-            _selectedCity!);
+            _selectedCity!,
+            ctx);
       }
       Navigator.of(context).pushReplacementNamed('/advertisement-overview');
     } on HttpException catch (error) {
@@ -299,7 +300,7 @@ class _AuthCardState extends State<AuthCard>
                   CircularProgressIndicator()
                 else
                   ElevatedButton(
-                    onPressed: _submit,
+                    onPressed: () => _submit(context),
                     style: ElevatedButton.styleFrom(
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30),

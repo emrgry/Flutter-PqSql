@@ -122,12 +122,13 @@ class Advertisements with ChangeNotifier {
   }
 
   Future<void> deleteProduct(String id) async {
-    final url = Uri.parse("");
+    final url = Uri.parse("http://localhost:8080/petShop/deletePost?id=${id}");
     final existingAdvIndex = _items.indexWhere((element) => element.id == id);
     Advertisement? existingProduct = _items[existingAdvIndex];
     _items.removeAt(existingAdvIndex);
     notifyListeners();
     final response = await http.delete(url);
+    print(response.statusCode);
     if (response.statusCode >= 400) {
       _items.insert(existingAdvIndex, existingProduct);
       notifyListeners();

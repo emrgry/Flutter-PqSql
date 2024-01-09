@@ -5,6 +5,8 @@ import 'package:pg_sql_app/Advertisement/advertisements.dart';
 import 'package:pg_sql_app/Advertisement/advertisementsGrid.dart';
 import 'package:pg_sql_app/Data/animal.dart';
 import 'package:pg_sql_app/Data/city.dart';
+import 'package:pg_sql_app/Login/auth.dart';
+import 'package:pg_sql_app/Login/profile_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 import '../AppDrawer/app_drawer.dart';
@@ -70,7 +72,7 @@ class _AdvertisementOverviewScreenState
     setState(() {
       _isLoading = false;
     });
-  }
+  } // getUserByUserName
 
   Future<void> fetchCities() async {
     // Fetch cities
@@ -262,6 +264,9 @@ class _AdvertisementOverviewScreenState
                         } else if (selectedAnimal != null) {
                           url =
                               'http://localhost:8080/petShop/findPostsByAnimalName?animalName=${selectedAnimal!.name}';
+                        } else if (selectedCity != null) {
+                          url =
+                              'http://localhost:8080/petShop/findByCityId?cityId=${selectedCity!.id}';
                         } else {
                           url = 'http://localhost:8080/petShop/getAllPosts';
                         }

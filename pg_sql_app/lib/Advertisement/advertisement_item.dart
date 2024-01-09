@@ -4,6 +4,7 @@ import 'package:pg_sql_app/Advertisement/advertisement.dart';
 import 'package:pg_sql_app/Advertisement/advertisementOverviewScreen.dart';
 import 'package:pg_sql_app/Login/auth.dart';
 import 'package:http/http.dart' as http;
+import 'package:pg_sql_app/Login/user_model.dart';
 import 'dart:convert';
 import 'package:provider/provider.dart';
 
@@ -20,10 +21,21 @@ class AdvertisementItem extends StatelessWidget {
     // });
   }
 
+  Future<User> fetchUser(String username) async {
+    var userResponse = await http.get(Uri.parse(
+        'http://localhost:8080/petShop/getUserByUserName?userName=${username}'));
+    print(userResponse.body);
+    User userData = User.fromJson(jsonDecode(userResponse.body));
+    return userData;
+  }
+
   @override
   Widget build(BuildContext context) {
+    User? user = Provider.of<AuthNotifier>(context, listen: false).user;
+    String username =
+        Provider.of<AuthNotifier>(context, listen: false).username;
     final advertisement = Provider.of<Advertisement>(context, listen: false);
-    final authdata = Provider.of<AuthNotifier>(context, listen: false);
+    final authdata = Provider.of<AuthNotifier>(context);
     return ClipRRect(
       borderRadius: BorderRadius.circular(10),
       child: GridTile(
@@ -35,9 +47,10 @@ class AdvertisementItem extends StatelessWidget {
                   ? Icons.add_box_outlined
                   : Icons.remove_circle_outline),
               color: Theme.of(context).colorScheme.secondary,
-              onPressed: () {
-                http.delete(Uri.parse(
-                    'http://localhost:8080/petShop/deletePost?id=${adv.id}'));
+              onPressed: () async {
+                print(adv.id);
+                await http.delete(Uri.parse(
+                    'http://localhost:8080/petShop/deletePost/${adv.id}'));
                 // adv.toggleApplyStatus(!adv.isUserApplied);
                 Navigator.of(context).pushReplacementNamed('/');
               },
@@ -81,8 +94,22 @@ class AdvertisementItem extends StatelessWidget {
                 actions: [
                   TextButton(
                     child: Text('Apply'),
-                    onPressed: () {
-                      // Handle apply action here
+                    onPressed: () async {
+                      User usr = await fetchUser(username);
+                      print(usr.id);
+                      try {
+                        final response = await http.post(
+                          Uri.parse(
+                              'http://localhost:8080/petShop/createApplication'),
+                          headers: {"Content-Type": "application/json"},
+                          body: json.encode({
+                            "postId": advertisement.id,
+                            "userId": usr.id,
+                            "isActive": true
+                          }),
+                        );
+                        Navigator.of(ctx).pop();
+                      } catch (e) {}
                     },
                   ),
                   TextButton(

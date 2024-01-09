@@ -139,11 +139,31 @@ class _AddAdvertisementPageState extends State<AddAdvertisementPage> {
                           },
                           body: advJson);
 
-                      if (response.statusCode == 200) {
+                      if (response.statusCode == 200 ||
+                          response.statusCode == 201) {
                         print('Advertisement sent successfully');
+                        // ignore: use_build_context_synchronously
+                        await showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: Text('Trigger is triggered'),
+                              content: Text('New post created: $title'),
+                              actions: <Widget>[
+                                TextButton(
+                                  child: Text('Close'),
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
+                              ],
+                            );
+                          },
+                        );
                       } else {
                         print('Failed to send advertisement');
                       }
+
                       Navigator.of(context).pushReplacementNamed('/');
                     }
                   },

@@ -7,6 +7,7 @@ class User {
   final String surname;
   final String address;
   final City city;
+  final int? id;
 
   User(
       {required this.username,
@@ -14,7 +15,8 @@ class User {
       required this.name,
       required this.surname,
       required this.address,
-      required this.city});
+      required this.city,
+      this.id});
 
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
@@ -23,6 +25,7 @@ class User {
         name: json['firstName'] ?? "",
         surname: json['lastName'] ?? "",
         address: json['address'] ?? "",
+        id: json['id'],
         city: City.fromJson(json['city']));
   }
 
