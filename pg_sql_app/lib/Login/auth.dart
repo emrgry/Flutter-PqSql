@@ -76,7 +76,8 @@ class AuthNotifier extends ChangeNotifier {
           builder: (BuildContext context) {
             return AlertDialog(
               title: Text('Trigger is Triggered'),
-              content: Text('New user created: $username'),
+              content: Text(
+                  'Asynchronous notification "user_created" with payload "New user created: $username" received from server process with PID 7205'),
               actions: <Widget>[
                 TextButton(
                   child: Text('Close'),

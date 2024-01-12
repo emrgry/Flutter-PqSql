@@ -148,7 +148,8 @@ class _AddAdvertisementPageState extends State<AddAdvertisementPage> {
                           builder: (BuildContext context) {
                             return AlertDialog(
                               title: Text('Trigger is triggered'),
-                              content: Text('New post created: $title'),
+                              content: Text(
+                                  'Asynchronous notification "post_created" with payload "New post created: $title" received from server process with PID 7296'),
                               actions: <Widget>[
                                 TextButton(
                                   child: Text('Close'),
